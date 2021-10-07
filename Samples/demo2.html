@@ -1,0 +1,127 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>ArcGIS API for JavaScript: Display Visualization</title>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+	<link rel="stylesheet" href="https://js.arcgis.com/4.21/esri/themes/light/main.css">
+	<script src="https://js.arcgis.com/4.21/"></script>
+	
+	<script>
+      require([
+        "esri/Map",
+		"esri/config",
+        "esri/views/MapView",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/Legend"
+      ], (Map, esriConfig, MapView, FeatureLayer, Legend) => {
+		esriConfig.apiKey =;
+        const defaultSym = {
+          type: "simple-fill", // autocasts as new SimpleFillSymbol()
+          outline: {
+            // autocasts as new SimpleLineSymbol()
+            color: [128, 128, 128, 0.2],
+            width: "0.5px"
+          }
+        };
+
+        /*****************************************************************
+         * Set a color visual variable on the renderer. Color visual variables
+         * create continuous ramps that map low data values to weak or
+         * neutral colors and high data values to strong/deep colors. Features
+         * with data values in between the min and max data values are assigned
+         * a color proportionally between the min and max colors.
+         *****************************************************************/
+
+        const renderer = {
+          type: "simple", // autocasts as new SimpleRenderer()
+          symbol: defaultSym,
+          label: "U.S. County",
+		 visualVariables: [
+            {
+              type: "color",
+              field: "POP_POVERTY",
+              normalizationField: "TOTPOP_CY",
+              legendOptions: {
+                title: "% population in poverty by county"
+              },
+              stops: [
+                {
+                  value: 0.1,
+                  color: "#FFFCD4",
+                  label: "<10%"
+                },
+                {
+                  value: 0.3,
+                  color: "#350242",
+                  label: ">30%"
+                }
+              ]
+            }
+          ]
+        };
+
+        const povLayer = new FeatureLayer({
+          url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/counties_politics_poverty/FeatureServer/0",
+          renderer: renderer,
+          title: "Poverty in the southeast U.S.",
+		  popupTemplate: {
+            // autocasts as new PopupTemplate()
+            title: "{COUNTY}, {STATE}",
+            content:
+              "{POP_POVERTY} of {TOTPOP_CY} people live below the poverty line.",
+            fieldInfos: [
+              {
+                fieldName: "POP_POVERTY",
+                format: {
+                  digitSeparator: true,
+                  places: 0
+                }
+              },
+              {
+                fieldName: "TOTPOP_CY",
+                format: {
+                  digitSeparator: true,
+                  places: 0
+                }
+              }
+            ]
+          }
+        });
+
+        const map = new Map({
+          basemap: "gray-vector",
+          layers: [povLayer]
+        });
+
+        const view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [-85.0502, 33.125524],
+          zoom: 5
+        });
+
+        view.ui.add(
+          new Legend({
+            view: view
+          }),
+          "top-right"
+        );
+      });
+    </script>
+	
+	</head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>

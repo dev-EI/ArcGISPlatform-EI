@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <title>Directions widget | Sample | ArcGIS API for JavaScript 4.20</title>
+
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.20/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.20/"></script>
+
+    <script>
+      require([
+        "esri/Map",
+        "esri/views/MapView",
+        "esri/widgets/Directions",
+        "esri/config"
+      ], function (Map, MapView, Directions, esriConfig) {
+        // An authorization string used to access the basemap, geocoding and routing services
+        esriConfig.apiKey = ;
+
+        const map = new Map({
+          basemap: "arcgis-topographic"
+        });
+
+        const view = new MapView({
+          zoom: 14,
+          center: [77.20, 28.60],
+          container: "viewDiv",
+          map: map
+        });
+
+        let directionsWidget = new Directions({
+          view: view
+        });
+
+        // Add the Directions widget to the top right corner of the view
+        view.ui.add(directionsWidget, {
+          position: "top-right"
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
